@@ -2,6 +2,9 @@ rootProject.name = "boki-board"
 
 include("common")
 include("common:snowflake")
+include("common:rest-exception-handler")
+include("common:aop-layer-logger")
+
 include("service")
 include("service:article")
 include("service:comment")

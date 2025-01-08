@@ -37,4 +37,31 @@ interface ArticleRepository : JpaRepository<Article, Long> {
         @Param("boardId") boardId: Long,
         @Param("limit") limit: Long
     ): Long
+
+    @Query(
+        value = "SELECT article_id, title, content, board_id, writer_id, created_at, modified_at " +
+                "FROM article " +
+                "WHERE board_id = :boardId " +
+                "ORDER BY article_id DESC " +
+                "LIMIT :limit",
+        nativeQuery = true
+    )
+    fun findAllInfiniteScroll(
+        @Param("boardId") boardId: Long,
+        @Param("limit") limit: Long,
+    ): List<Article>
+
+    @Query(
+        value = "SELECT article_id, title, content, board_id, writer_id, created_at, modified_at " +
+                "FROM article " +
+                "WHERE board_id = :boardId AND article_id < :lastArticleId " +
+                "ORDER BY article_id DESC " +
+                "LIMIT :limit",
+        nativeQuery = true
+    )
+    fun findAllInfiniteScroll(
+        @Param("boardId") boardId: Long,
+        @Param("limit") limit: Long,
+        @Param("lastArticleId") lastArticleId: Long,
+    ): List<Article>
 }

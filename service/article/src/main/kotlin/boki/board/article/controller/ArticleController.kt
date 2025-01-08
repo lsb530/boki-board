@@ -50,12 +50,32 @@ class ArticleController(
         )
     }
 
+    @GetMapping("/infinite-scroll")
+    fun readAllInfiniteScroll(
+        @RequestParam("boardId") boardId: Long,
+        @RequestParam("pageSize") pageSize: Long,
+        @RequestParam("lastArticleId", required = false) lastArticleId: Long?,
+    ): ResponseEntity<List<ArticleDetailResponse>> {
+        return ResponseEntity.ok(
+            articleService.readAllInfiniteScroll(
+                boardId = boardId,
+                pageSize = pageSize,
+                lastArticleId = lastArticleId
+            )
+        )
+    }
+
     @PatchMapping("/{articleId}")
     fun update(
         @PathVariable articleId: Long,
         @RequestBody request: ArticleUpdateRequest
     ): ResponseEntity<ArticleDetailResponse> {
-        return ResponseEntity.ok(articleService.update(articleId, request))
+        return ResponseEntity.ok(
+            articleService.update(
+                articleId = articleId,
+                request = request
+            )
+        )
     }
 
     @DeleteMapping("/{articleId}")

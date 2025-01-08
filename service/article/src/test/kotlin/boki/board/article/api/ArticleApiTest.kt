@@ -5,6 +5,7 @@ import boki.board.article.service.request.ArticleUpdateRequest
 import boki.board.article.service.response.ArticleDetailResponse
 import boki.board.article.service.response.ArticlePageResponse
 import org.junit.jupiter.api.Test
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestClient
 import kotlin.test.assertEquals
@@ -92,6 +93,29 @@ class ArticleApiTest {
         assertEquals(1_500_000 + 1, response2.body!!.count) // 301
     }
 
+    @Test
+    fun readAllInfiniteScrollTest() {
+        val response1 = readAllInfiniteScroll(
+            boardId = 1L,
+            pageSize = 5L
+        )
+        println("first page")
+        for (article in response1.body!!) {
+            println(article.articleId)
+        }
+
+        val lastArticleId = response1.body!!.last().articleId
+        val response2 = readAllInfiniteScroll(
+            boardId = 1L,
+            pageSize = 5L,
+            lastArticleId = lastArticleId
+        )
+        println("second page")
+        for (article in response2.body!!) {
+            println(article.articleId)
+        }
+    }
+
     private fun create(
         request: ArticleCreateRequest
     ): ResponseEntity<ArticleDetailResponse> {
@@ -120,6 +144,22 @@ class ArticleApiTest {
             .uri("/v1/articles?boardId=$boardId&page=$page&pageSize=$pageSize")
             .retrieve()
             .toEntity(ArticlePageResponse::class.java)
+    }
+
+    private fun readAllInfiniteScroll(
+        boardId: Long,
+        pageSize: Long,
+        lastArticleId: Long? = null
+    ): ResponseEntity<List<ArticleDetailResponse>> {
+        val url = if (lastArticleId == null) {
+            "/v1/articles/infinite-scroll?boardId=$boardId&pageSize=$pageSize"
+        } else {
+            "/v1/articles/infinite-scroll?boardId=$boardId&pageSize=$pageSize&lastArticleId=$lastArticleId"
+        }
+        return restClient.get()
+            .uri(url)
+            .retrieve()
+            .toEntity(object : ParameterizedTypeReference<List<ArticleDetailResponse>>() {})
     }
 
     private fun update(

@@ -75,6 +75,26 @@ class ArticleService(
         )
     }
 
+    fun readAllInfiniteScroll(
+        boardId: Long,
+        pageSize: Long,
+        lastArticleId: Long?,
+    ): List<ArticleDetailResponse> {
+        val articles = if (lastArticleId == null) {
+            articleRepository.findAllInfiniteScroll(
+                boardId = boardId,
+                limit = pageSize,
+            )
+        } else {
+            articleRepository.findAllInfiniteScroll(
+                boardId = boardId,
+                limit = pageSize,
+                lastArticleId = lastArticleId
+            )
+        }
+        return articles.map(ArticleDetailResponse::from).toList()
+    }
+
     private fun readArticleById(articleId: Long): Article {
         return articleRepository.findByIdOrNull(articleId)
             ?: throw RuntimeException("Article not found with id: $articleId")

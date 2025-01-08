@@ -5,6 +5,7 @@ import boki.board.article.repository.ArticleRepository
 import boki.board.article.service.request.ArticleCreateRequest
 import boki.board.article.service.request.ArticleUpdateRequest
 import boki.board.article.service.response.ArticleDetailResponse
+import boki.board.article.service.response.ArticlePageResponse
 import boki.board.common.snowflake.Snowflake
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -49,6 +50,29 @@ class ArticleService(
     fun delete(articleId: Long) {
         val article = readArticleById(articleId)
         articleRepository.delete(article)
+    }
+
+    fun readAll(
+        boardId: Long,
+        page: Long,
+        pageSize: Long,
+    ): ArticlePageResponse {
+        return ArticlePageResponse.of(
+            articles = articleRepository.findAll(
+                boardId = boardId,
+                offset = (page - 1) * pageSize,
+                limit = pageSize
+            ).map(ArticleDetailResponse::from)
+                .toList(),
+            count = articleRepository.count(
+                boardId = boardId,
+                PageLimitCalculator.calculatePageLimit(
+                    page = page,
+                    pageSize = pageSize,
+                    movablePageCount = 10L
+                )
+            ),
+        )
     }
 
     private fun readArticleById(articleId: Long): Article {

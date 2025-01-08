@@ -3,6 +3,7 @@ package boki.board.article.api
 import boki.board.article.service.request.ArticleCreateRequest
 import boki.board.article.service.request.ArticleUpdateRequest
 import boki.board.article.service.response.ArticleDetailResponse
+import boki.board.article.service.response.ArticlePageResponse
 import org.junit.jupiter.api.Test
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestClient
@@ -66,6 +67,31 @@ class ArticleApiTest {
         assertTrue { response.statusCode.is2xxSuccessful }
     }
 
+    @Test
+    fun readAllTest() {
+        val page1 = Triple(1L, 1L, 30L)
+        val response1 = readAll(
+            boardId = page1.first,
+            page = page1.second,
+            pageSize = page1.third
+        )
+        assertTrue { response1.statusCode.is2xxSuccessful }
+        assertEquals(300 + 1, response1.body!!.count) // 301
+        // response1.body?.let {
+        //     for (article in it.articles)
+        //         println(article.articleId)
+        // }
+
+        val page50000 = Triple(1L, 50000L, 30L)
+        val response2 = readAll(
+            boardId = page50000.first,
+            page = page50000.second,
+            pageSize = page50000.third
+        )
+        assertTrue { response2.statusCode.is2xxSuccessful }
+        assertEquals(1_500_000 + 1, response2.body!!.count) // 301
+    }
+
     private fun create(
         request: ArticleCreateRequest
     ): ResponseEntity<ArticleDetailResponse> {
@@ -83,6 +109,17 @@ class ArticleApiTest {
             .uri("/v1/articles/$articleId")
             .retrieve()
             .toEntity(ArticleDetailResponse::class.java)
+    }
+
+    private fun readAll(
+        boardId: Long,
+        page: Long,
+        pageSize: Long,
+    ): ResponseEntity<ArticlePageResponse> {
+        return restClient.get()
+            .uri("/v1/articles?boardId=$boardId&page=$page&pageSize=$pageSize")
+            .retrieve()
+            .toEntity(ArticlePageResponse::class.java)
     }
 
     private fun update(

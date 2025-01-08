@@ -26,3 +26,17 @@ data class ArticleDetailResponse(
         }
     }
 }
+
+data class ArticlePageResponse(
+    val articles: List<ArticleDetailResponse>,
+    val count: Long,
+) {
+    companion object {
+        fun of(articles: List<ArticleDetailResponse>, count: Long): ArticlePageResponse {
+            return ArticlePageResponse(
+                articles = articles,
+                count = count
+            )
+        }
+    }
+}

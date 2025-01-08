@@ -4,6 +4,7 @@ import boki.board.article.service.ArticleService
 import boki.board.article.service.request.ArticleCreateRequest
 import boki.board.article.service.request.ArticleUpdateRequest
 import boki.board.article.service.response.ArticleDetailResponse
+import boki.board.article.service.response.ArticlePageResponse
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
 import org.springframework.http.ResponseEntity
@@ -32,6 +33,21 @@ class ArticleController(
         @PathVariable @Positive articleId: Long
     ): ResponseEntity<ArticleDetailResponse> {
         return ResponseEntity.ok(articleService.read(articleId))
+    }
+
+    @GetMapping
+    fun readAll(
+        @RequestParam("boardId") boardId: Long,
+        @RequestParam("page") page: Long,
+        @RequestParam("pageSize") pageSize: Long,
+    ): ResponseEntity<ArticlePageResponse> {
+        return ResponseEntity.ok(
+            articleService.readAll(
+                boardId = boardId,
+                page = page,
+                pageSize = pageSize
+            )
+        )
     }
 
     @PatchMapping("/{articleId}")

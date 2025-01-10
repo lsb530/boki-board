@@ -9,13 +9,13 @@ import java.time.LocalDateTime
 @Entity
 class Article protected constructor (
     @Id
-    val articleId: Long? = null,
-    var title: String,
-    var content: String,
-    val boardId: Long, // shared key
-    val writerId: Long,
-    val createdAt: LocalDateTime,
-    var modifiedAt: LocalDateTime,
+    private val articleId: Long? = null,
+    private var title: String,
+    private var content: String,
+    private val boardId: Long, // shared key
+    private val writerId: Long,
+    private val createdAt: LocalDateTime,
+    private var modifiedAt: LocalDateTime,
 ) {
     companion object {
         fun of(
